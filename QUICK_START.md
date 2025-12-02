@@ -48,6 +48,20 @@ Deploy (resumo)
 - Execute `schema_postgres.sql` e `seed_postgres.sql` no Postgres de produção.
 - Defina `SECRET_KEY` e `DATABASE_URL` como variáveis de ambiente no serviço.
 
+Automação (GitHub Actions)
+- Um workflow foi adicionado para publicar o frontend no GitHub Pages automaticamente ao dar push na branch `main`.
+- Arquivo: `.github/workflows/deploy_frontend_pages.yml` — publica todos os arquivos do repositório exceto a pasta `backend`.
+- Template para deploy do backend no Render: `.github/workflows/deploy_backend_render.yml`. Ele faz uma chamada à API do Render para disparar um deploy e requer dois secrets configurados no repositório:
+	- `RENDER_API_KEY` — sua API key do Render.
+	- `RENDER_SERVICE_ID` — o ID do serviço no Render (sem o prefixo `srv-`).
+
+Como configurar os secrets no GitHub:
+1. Abra o repositório no GitHub.
+2. Vá em `Settings` → `Secrets and variables` → `Actions` → `New repository secret`.
+3. Crie `RENDER_API_KEY` e `RENDER_SERVICE_ID` com os valores apropriados.
+
+Quando os secrets estiverem configurados, um push para `main` disparará automaticamente o workflow de deploy do backend (secrets válidos) e o Pages publicará o frontend.
+
 Contato
 - Se quiser que eu automatize os passos acima (workflows, deploy), diga qual opção prefere: GitHub Actions + Pages para frontend, e Render/Railway para backend.
 # 🚀 Pense Offline - Guia Rápido de Início
