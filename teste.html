@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <style>
+    body { padding-top: 20px; background: #f5f5f5; }
+    .test-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .test-result { padding: 10px; margin: 5px 0; border-radius: 4px; }
+    .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+    .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Teste de Integração - Pense Offline</h1>
+    
+    <div class="test-section">
+      <h3>Status do Servidor</h3>
+      <div id="server-status"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Teste de Registro</h3>
+      <form id="registerForm">
+        <div class="form-group">
+          <input type="text" class="form-control" name="username" placeholder="Usuário" required>
+        </div>
+        <div class="form-group">
+          <input type="email" class="form-control" name="email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" name="name" placeholder="Nome completo" required>
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" name="password" placeholder="Senha (mín 6 caracteres)" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+      </form>
+      <div id="register-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Teste de Login</h3>
+      <form id="loginForm">
+        <div class="form-group">
+          <input type="text" class="form-control" name="username" placeholder="Usuário" required>
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" name="password" placeholder="Senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Fazer Login</button>
+      </form>
+      <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Dados Armazenados</h3>
+      <button class="btn btn-info" onclick="showStoredData()">Mostrar Dados do localStorage</button>
+      <pre id="stored-data"></pre>
+    </div>
+
+    <div class="test-section">
+      <h3>Endpoint /users</h3>
+      <button class="btn btn-info" onclick="testUsersEndpoint()">Listar Usuários</button>
+      <pre id="users-result"></pre>
+    </div>
+  </div>
+
+  <script src="/api-client.js"></script>
+  <script>
+    // Teste de status do servidor
+    async function testServerStatus() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/health');
+        const statusDiv = document.getElementById('server-status');
+        if (res.ok) {
+          statusDiv.innerHTML = '<div class="test-result success">✅ Servidor rodando em http://127.0.0.1:8000</div>';
+        } else {
+          statusDiv.innerHTML = '<div class="test-result error">❌ Servidor retornou status: ' + res.status + '</div>';
+        }
+      } catch (error) {
+        document.getElementById('server-status').innerHTML = '<div class="test-result error">❌ Erro ao conectar: ' + error.message + '</div>';
+      }
+    }
+
+    // Teste de registro
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const resultDiv = document.getElementById('register-result');
+      
+      try {
+        const username = document.querySelector('#registerForm [name="username"]').value;
+        const email = document.querySelector('#registerForm [name="email"]').value;
+        const name = document.querySelector('#registerForm [name="name"]').value;
+        const password = document.querySelector('#registerForm [name="password"]').value;
+        
+        const result = await api.register({ username, email, name, password });
+        resultDiv.innerHTML = '<div class="test-result success">✅ Registro bem-sucedido!<br>Token: ' + result.access_token.substring(0, 20) + '...</div>';
+      } catch (error) {
+        resultDiv.innerHTML = '<div class="test-result error">❌ Erro: ' + error.message + '</div>';
+      }
+    });
+
+    // Teste de login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const resultDiv = document.getElementById('login-result');
+      
+      try {
+        const username = document.querySelector('#loginForm [name="username"]').value;
+        const password = document.querySelector('#loginForm [name="password"]').value;
+        
+        const result = await api.login(username, password);
+        resultDiv.innerHTML = '<div class="test-result success">✅ Login bem-sucedido!<br>Usuário: ' + result.username + '</div>';
+      } catch (error) {
+        resultDiv.innerHTML = '<div class="test-result error">❌ Erro: ' + error.message + '</div>';
+      }
+    });
+
+    function showStoredData() {
+      const token = localStorage.getItem('pensOffline_token');
+      const user = localStorage.getItem('pensOffline_user');
+      const data = {
+        token: token ? token.substring(0, 30) + '...' : 'Não definido',
+        user: user ? JSON.parse(user) : 'Não definido'
+      };
+      document.getElementById('stored-data').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function testUsersEndpoint() {
+      const resultDiv = document.getElementById('users-result');
+      try {
+        const users = await api.getCommunities(); // Usando comunidades como teste
+        resultDiv.textContent = JSON.stringify(users, null, 2);
+      } catch (error) {
+        resultDiv.textContent = 'Erro: ' + error.message;
+      }
+    }
+
+    // Testar ao carregar
+    testServerStatus();
+  </script>
+</body>
+</html>

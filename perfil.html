@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <link rel="stylesheet" href="/web-files/portalbasictheme.css">
+  <style>
+    body { padding-top: 70px; background: #f5f5f5; }
+    .profile-container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .button1 {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .button1:hover { background-color: #0056b3; }
+    .button-danger {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button-danger:hover { background-color: #c82333; }
+    .profile-info { margin-bottom: 30px; }
+    .profile-info dt { font-weight: 600; margin-top: 10px; }
+    .edit-form { display: none; }
+    .list-profiles { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Pense Offline</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/">Início</a></li>
+          <li class="active"><a href="/perfil.html">Perfil</a></li>
+          <li><a href="/cadastro.html">Cadastro</a></li>
+          <li><a href="http://127.0.0.1:8000/docs" target="_blank">API</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="profile-container">
+      <h2 style="text-align: center; margin-bottom: 30px;">Gerenciar Perfil de Usuário</h2>
+      
+      <!-- Informações do perfil -->
+      <div id="profile-view" style="display: none;">
+        <h3>Informações do Perfil</h3>
+        <p class="text-muted">O <strong>Nome</strong> que você forneceu será exibido junto a comentários, postagens em fóruns ou em opiniões que você publicar no site. O <strong>Email</strong> e o <strong>Telefone</strong> não serão exibidos publicamente.</p>
+        
+        <dl class="profile-info">
+          <dt>ID:</dt>
+          <dd id="profile-id">-</dd>
+          <dt>Nome:</dt>
+          <dd id="profile-name">-</dd>
+          <dt>Email:</dt>
+          <dd id="profile-email">-</dd>
+          <dt>Telefone:</dt>
+          <dd id="profile-phone">-</dd>
+          <dt>Criado em:</dt>
+          <dd id="profile-created">-</dd>
+          <dt>Atualizado em:</dt>
+          <dd id="profile-updated">-</dd>
+        </dl>
+
+        <button class="button1" onclick="showEditForm()">Editar Perfil</button>
+        <button class="button-danger" onclick="deleteProfile()">Excluir Conta</button>
+      </div>
+
+      <!-- Formulário de edição -->
+      <div id="edit-form" class="edit-form">
+        <h3>Editar Perfil</h3>
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label for="edit-name">Nome Completo</label>
+            <input type="text" class="form-control" id="edit-name" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">Email</label>
+            <input type="email" class="form-control" id="edit-email" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-phone">Telefone</label>
+            <input type="tel" class="form-control" id="edit-phone" required>
+          </div>
+          <button type="submit" class="button1">Salvar Alterações</button>
+          <button type="button" class="button1" onclick="cancelEdit()" style="background-color: #6c757d;">Cancelar</button>
+        </form>
+      </div>
+
+      <!-- Lista de todos os perfis -->
+      <div class="list-profiles">
+        <h3>Todos os Perfis Cadastrados</h3>
+        <p class="text-muted">Total: <span id="total-profiles">0</span></p>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="profiles-table-body">
+              <tr><td colspan="5" class="text-center">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="message"></div>
+    </div>
+  </div>
+
+  <footer style="margin-top: 50px; padding: 20px 0; background: white; border-top: 1px solid #ddd;">
+    <div class="container">
+      <p class="text-center text-muted">Desafio Positivo &copy; 2025</p>
+    </div>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/web-files/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    let currentUser = null;
+
+    // Redirecionar se não autenticado
+    document.addEventListener('DOMContentLoaded', async function() {
+      if (!api.isAuthenticated()) {
+        window.location.href = '/login.html';
+      }
+      
+      try {
+        currentUser = await api.getCurrentUser();
+        displayUserProfile(currentUser);
+      } catch (error) {
+        showMessage('Erro ao carregar perfil', 'danger');
+      }
+    });
+
+    function displayUserProfile(user) {
+      document.getElementById('profile-id').textContent = user.id;
+      document.getElementById('profile-name').textContent = user.name;
+      document.getElementById('profile-email').textContent = user.email;
+      document.getElementById('profile-phone').textContent = user.phone || '-';
+      document.getElementById('profile-created').textContent = new Date(user.created_at).toLocaleString('pt-BR');
+      document.getElementById('profile-updated').textContent = new Date(user.updated_at).toLocaleString('pt-BR');
+      
+      document.getElementById('profile-view').style.display = 'block';
+      
+      // Mostrar estatísticas adicionais
+      const statsHtml = `
+        <hr>
+        <h4>📊 Estatísticas</h4>
+        <dl class="profile-info">
+          <dt>Pontos:</dt>
+          <dd>${user.pontos}</dd>
+          <dt>Nível:</dt>
+          <dd>${user.nivel}</dd>
+          <dt>XP Total:</dt>
+          <dd>${user.xp_total}</dd>
+          <dt>Tempo sem tela (minutos):</dt>
+          <dd>${user.tempo_sem_tela_minutos}</dd>
+          <dt>Desafios completados:</dt>
+          <dd>${user.desafios_completados}</dd>
+          <dt>Dias consecutivos:</dt>
+          <dd>${user.dias_consecutivos}</dd>
+        </dl>
+        <button class="button1" onclick="loadXPHistory()">Ver Histórico de XP</button>
+      `;
+      
+      document.getElementById('profile-view').innerHTML += statsHtml;
+    }
+
+    function showEditForm() {
+      document.getElementById('edit-name').value = currentUser.name;
+      document.getElementById('edit-email').value = currentUser.email;
+      document.getElementById('edit-phone').value = currentUser.phone || '';
+      
+      document.getElementById('profile-view').style.display = 'none';
+      document.getElementById('edit-form').style.display = 'block';
+    }
+
+    function cancelEdit() {
+      document.getElementById('profile-view').style.display = 'block';
+      document.getElementById('edit-form').style.display = 'none';
+    }
+
+    document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const button = e.target.querySelector('button[type="submit"]');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Salvando...';
+      
+      try {
+        // Nota: api-client.js não tem método PUT, precisamos usar fetch diretamente
+        const token = localStorage.getItem('pensOffline_token');
+        const name = document.getElementById('edit-name').value;
+        const email = document.getElementById('edit-email').value;
+        const phone = document.getElementById('edit-phone').value;
+
+        const response = await fetch('http://127.0.0.1:8000/users/me?name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone), {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const updated = await response.json();
+          currentUser = updated;
+          document.getElementById('profile-view').innerHTML = '';
+          displayUserProfile(currentUser);
+          cancelEdit();
+          showMessage('Perfil atualizado com sucesso!', 'success');
+        } else {
+          showMessage('Erro ao atualizar perfil', 'danger');
+        }
+      } catch (error) {
+        showMessage('Erro ao conectar com o servidor: ' + error.message, 'danger');
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+
+    async function deleteProfile() {
+      if (!confirm('Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.')) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('pensOffline_token');
+        const response = await fetch('http://127.0.0.1:8000/users/me', {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok || response.status === 204) {
+          showMessage('Conta excluída com sucesso!', 'success');
+          api.logout();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        } else {
+          showMessage('Erro ao excluir conta', 'danger');
+        }
+      } catch (error) {
+        showMessage('Erro ao conectar com o servidor', 'danger');
+      }
+    }
+
+    async function loadXPHistory() {
+      try {
+        const history = await api.getXPHistory();
+        displayXPHistory(history);
+      } catch (error) {
+        showMessage('Erro ao carregar histórico de XP', 'danger');
+      }
+    }
+
+    function displayXPHistory(history) {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;';
+      
+      let content = '<h3>Histórico de XP</h3>';
+      if (history.length === 0) {
+        content += '<p>Nenhum registro de XP</p>';
+      } else {
+        content += '<table class="table table-striped"><thead><tr><th>Tipo</th><th>XP</th><th>Data</th></tr></thead><tbody>';
+        history.forEach(record => {
+          content += `<tr><td>${record.type}</td><td>${record.xp_amount}</td><td>${new Date(record.created_at).toLocaleString('pt-BR')}</td></tr>`;
+        });
+        content += '</tbody></table>';
+      }
+      
+      modal.innerHTML = `<div style="background: white; padding: 30px; border-radius: 8px; max-width: 600px; max-height: 80vh; overflow-y: auto;">${content}<button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove()">Fechar</button></div>`;
+      document.body.appendChild(modal);
+    }
+
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.innerHTML = `<div class="alert alert-${type}" style="margin-top: 20px;">${text}</div>`;
+      setTimeout(() => {
+        messageDiv.innerHTML = '';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
