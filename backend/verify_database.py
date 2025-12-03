@@ -16,6 +16,7 @@ from sqlmodel import Session, select
 from app.database import engine, init_db, DATABASE_URL
 from app.models import UserProfile, Community, Event, XPHistory, CommunityMembership
 from app.auth import hash_password, verify_password
+from sqlalchemy import text
 
 
 class DatabaseVerifier:
@@ -39,8 +40,9 @@ class DatabaseVerifier:
         """Testa a conexão com o banco de dados"""
         try:
             with Session(engine) as session:
-                # Tenta executar uma query simples
-                session.exec(select(UserProfile).limit(1))
+                # Testa a conexão executando uma query simples que não depende de tabelas
+                result = session.execute(text("SELECT 1")).scalar()
+                assert result == 1
             self.log_success("Conexão com banco de dados", f"URL: {DATABASE_URL}")
             return True
         except Exception as e:
@@ -323,6 +325,11 @@ class DatabaseVerifier:
     def test_user_level_calculation(self) -> bool:
         """Testa o cálculo automático de nível baseado em pontos"""
         try:
+            # Constantes para cálculo de nível (100 pontos = 1 nível)
+            POINTS_PER_LEVEL = 100
+            TEST_POINTS_LEVEL_2 = 150  # 150 pontos = nível 2
+            TEST_POINTS_LEVEL_5 = 400  # 400 pontos = nível 5
+            
             with Session(engine) as session:
                 # Criar usuário
                 test_user = UserProfile(
@@ -342,22 +349,23 @@ class DatabaseVerifier:
                 self.log_success("Level Calculation", "Nível inicial: 1")
                 
                 # Adicionar 150 pontos (deve ser nível 2)
-                test_user.adicionar_pontos(150)
+                test_user.adicionar_pontos(TEST_POINTS_LEVEL_2)
                 session.add(test_user)
                 session.commit()
                 session.refresh(test_user)
-                assert test_user.pontos == 150
+                assert test_user.pontos == TEST_POINTS_LEVEL_2
                 assert test_user.nivel == 2
-                self.log_success("Level Calculation", "150 pontos = Nível 2")
+                self.log_success("Level Calculation", f"{TEST_POINTS_LEVEL_2} pontos = Nível 2")
                 
                 # Adicionar mais 250 pontos (total 400 = nível 5)
-                test_user.adicionar_pontos(250)
+                additional_points = TEST_POINTS_LEVEL_5 - TEST_POINTS_LEVEL_2
+                test_user.adicionar_pontos(additional_points)
                 session.add(test_user)
                 session.commit()
                 session.refresh(test_user)
-                assert test_user.pontos == 400
+                assert test_user.pontos == TEST_POINTS_LEVEL_5
                 assert test_user.nivel == 5
-                self.log_success("Level Calculation", "400 pontos = Nível 5")
+                self.log_success("Level Calculation", f"{TEST_POINTS_LEVEL_5} pontos = Nível 5")
                 
                 # Limpar
                 session.delete(test_user)
@@ -377,8 +385,8 @@ class DatabaseVerifier:
         print(f"📊 Banco de dados: {DATABASE_URL}\n")
         
         tests = [
-            ("Criação de Tabelas", self.test_table_creation),
             ("Conexão", self.test_database_connection),
+            ("Criação de Tabelas", self.test_table_creation),
             ("CRUD de Usuários", self.test_user_crud),
             ("CRUD de Comunidades", self.test_community_crud),
             ("CRUD de Eventos", self.test_event_crud),
