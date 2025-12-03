@@ -1,0 +1,56 @@
+name: Deploy backend + apply DB (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-and-db:
+    runs-on: ubuntu-latest
+    env:
+      # Use secrets to provide DB connection and Render API info
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.SUPABASE_DB_URL }}" ]; then echo "SUPABASE_DB_URL not set"; exit 1; fi
+          if [ -z "${{ secrets.RENDER_API_KEY }}" ]; then echo "RENDER_API_KEY not set"; exit 1; fi
+          if [ -z "${{ secrets.RENDER_SERVICE_ID }}" ]; then echo "RENDER_SERVICE_ID not set"; exit 1; fi
+
+      - name: Trigger Render deploy
+        run: |
+          echo "Triggering Render deploy for service $RENDER_SERVICE_ID"
+          curl -s -X POST "https://api.render.com/deploy/srv-$RENDER_SERVICE_ID" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": true}' || true
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Apply schema to Supabase/Postgres
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "Applying schema_postgres.sql"
+          # Ensure PGSSL is required for Supabase
+          export PGSSLMODE=require
+          # If SUPABASE_DB_URL is a full connection string, psql will use it
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f backend/schema_postgres.sql
+
+      - name: Apply seed data
+        run: |
+          export PGSSLMODE=require
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f backend/seed_postgres.sql
+
+      - name: Finish
+        run: |
+          echo "Deploy triggered and DB schema/seed applied (if SQL ran successfully)."
