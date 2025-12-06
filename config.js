@@ -9,11 +9,11 @@
  * 
  * Para produção (Vercel):
  *   - Descomente e configure a URL do seu backend
- *   - Exemplo: window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+ *   - Exemplo: window.PENSEOFFLINE_API_URL = 'https://your-backend-api.example.com';
  */
 
 // PRODUÇÃO: Descomente e configure a URL do seu backend
-// window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+// window.PENSEOFFLINE_API_URL = 'https://your-backend-api.example.com';
 
 // DESENVOLVIMENTO: Comente ou remova a linha acima
 // O padrão é http://127.0.0.1:8000

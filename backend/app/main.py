@@ -32,6 +32,14 @@ environment = os.getenv("ENVIRONMENT", "development")
 if cors_origins_str:
     # Se CORS_ORIGINS está definida, use apenas essas origens
     allowed_origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+    
+    # Validar que todas as origens em produção usam HTTPS
+    if environment == "production":
+        for origin in allowed_origins:
+            if not origin.startswith("https://") and not origin.startswith("http://localhost") and not origin.startswith("http://127.0.0.1"):
+                logger.error(f"SECURITY ERROR: Origin '{origin}' does not use HTTPS in production environment")
+                raise ValueError(f"All production CORS origins must use HTTPS. Invalid origin: {origin}")
+    
     logger.info(f"CORS configured with specific origins: {allowed_origins}")
 elif environment == "production":
     # Em produção, exigir que CORS_ORIGINS seja definida
