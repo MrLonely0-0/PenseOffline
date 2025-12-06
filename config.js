@@ -1,21 +1,28 @@
 /**
  * Configuração do ambiente para PenseOffline
  * 
- * Este arquivo é OPCIONAL e deve ser incluído ANTES do api-client.js se necessário.
- * 
- * ✅ DETECÇÃO AUTOMÁTICA (Recomendado):
- *   O api-client.js detecta automaticamente o ambiente:
- *   - Localhost (127.0.0.1 ou localhost): usa http://127.0.0.1:8000
- *   - Produção (Vercel/outro): usa a mesma origem do frontend
- * 
- * ⚙️ CONFIGURAÇÃO MANUAL (Apenas se backend em servidor separado):
- *   Se seu backend está em um servidor diferente do frontend (ex: Render, Railway),
- *   descomente e configure a URL abaixo:
- * 
- *   Exemplo: window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+ * ✅ URL da API configurada para produção no Vercel
  */
 
-// 🔧 BACKEND SEPARADO: Descomente e configure apenas se usar servidor separado
-// window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+// Detecta automaticamente se está rodando em localhost ou em produção
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
-// 💡 DICA: Se frontend e backend estão ambos no Vercel, não precisa configurar nada!
+// Configuração da URL da API
+if (isLocalhost) {
+  // Desenvolvimento local
+  window.PENSEOFFLINE_API_URL = 'http://127.0.0.1:8000';
+} else {
+  // Produção no Vercel
+  window.PENSEOFFLINE_API_URL = 'https://pense-offline.vercel.app';
+}
+
+// Helper para fazer fetch com a URL correta automaticamente
+window.getApiUrl = function(path) {
+  const baseUrl = window.PENSEOFFLINE_API_URL || 'http://127.0.0.1:8000';
+  // Remove barra inicial do path se existir para evitar duplicação
+  const cleanPath = path.startsWith('/') ? path : '/' + path;
+  return baseUrl + cleanPath;
+};
+
+console.log('[PenseOffline] API URL configurada:', window.PENSEOFFLINE_API_URL);

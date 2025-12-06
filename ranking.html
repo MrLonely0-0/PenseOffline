@@ -125,7 +125,7 @@
     async function loadRanking() {
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const res = await fetch('http://127.0.0.1:8000/users', {
+        const res = await fetch(getApiUrl('/users'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
