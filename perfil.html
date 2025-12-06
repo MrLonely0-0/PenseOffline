@@ -60,17 +60,8 @@
           <li><a href="/">Início</a></li>
           <li class="active"><a href="/perfil.html">Perfil</a></li>
           <li><a href="/cadastro.html">Cadastro</a></li>
-          <li><a id="apiDocsLink" href="#" target="_blank">API</a></li>
+          <li><a href="#" target="_blank" data-api-docs-link>API</a></li>
         </ul>
-        <script>
-          // Configura o link da API dinamicamente
-          document.addEventListener('DOMContentLoaded', function() {
-            const apiLink = document.getElementById('apiDocsLink');
-            if (apiLink && window.PENSEOFFLINE_API_URL) {
-              apiLink.href = window.PENSEOFFLINE_API_URL + '/docs';
-            }
-          });
-        </script>
       </div>
     </div>
   </nav>

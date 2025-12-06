@@ -25,4 +25,21 @@ window.getApiUrl = function(path) {
   return baseUrl + cleanPath;
 };
 
+// Helper para configurar links da API docs automaticamente
+window.setupApiDocsLinks = function() {
+  const apiLinks = document.querySelectorAll('[data-api-docs-link]');
+  apiLinks.forEach(link => {
+    if (window.PENSEOFFLINE_API_URL) {
+      link.href = window.PENSEOFFLINE_API_URL + '/docs';
+    }
+  });
+};
+
+// Configurar links da API quando o DOM estiver pronto
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', window.setupApiDocsLinks);
+} else {
+  window.setupApiDocsLinks();
+}
+
 console.log('[PenseOffline] API URL configurada:', window.PENSEOFFLINE_API_URL);

@@ -3,36 +3,17 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-// Detecta automaticamente se está rodando em localhost ou em produção
-const isLocalhost = typeof window !== 'undefined' && 
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-
-// Configuração automática da URL da API:
-// - Em localhost: usa http://127.0.0.1:8000 (backend local)
-// - Em produção: usa window.PENSEOFFLINE_API_URL se definido, senão assume backend na mesma origem
-// 
-// Para configurar em produção com backend separado (ex: Render):
-// Adicione no config.js: window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+// Usar a configuração do config.js se disponível, senão usar fallback
+// NOTA: config.js deve ser carregado ANTES deste arquivo
 let API_URL;
-if (typeof window !== 'undefined') {
-  if (window.PENSEOFFLINE_API_URL) {
-    // Configuração manual (config.js ou variável de ambiente)
-    API_URL = window.PENSEOFFLINE_API_URL;
-    console.log('[PenseOffline] API URL configurada manualmente:', API_URL);
-  } else if (isLocalhost) {
-    // Desenvolvimento local: backend na porta 8000
-    API_URL = "http://127.0.0.1:8000";
-    console.log('[PenseOffline] Ambiente detectado: DESENVOLVIMENTO (localhost)');
-    console.log('[PenseOffline] API URL:', API_URL);
-  } else {
-    // Produção: assume backend na mesma origem (tudo no Vercel)
-    API_URL = window.location.origin;
-    console.log('[PenseOffline] Ambiente detectado: PRODUÇÃO');
-    console.log('[PenseOffline] API URL (mesma origem):', API_URL);
-    console.log('[PenseOffline] Se o backend estiver em servidor separado, configure window.PENSEOFFLINE_API_URL em config.js');
-  }
+if (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) {
+  // Usar configuração do config.js
+  API_URL = window.PENSEOFFLINE_API_URL;
+  console.log('[APIClient] Usando URL da configuração:', API_URL);
 } else {
+  // Fallback para desenvolvimento local
   API_URL = "http://127.0.0.1:8000";
+  console.log('[APIClient] AVISO: config.js não carregado, usando fallback:', API_URL);
 }
 
 const TOKEN_KEY = "pensOffline_token";
