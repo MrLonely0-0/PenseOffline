@@ -48,7 +48,7 @@
           <li><a href="/">Início</a></li>
           <li><a href="/perfil.html">Perfil</a></li>
           <li class="active"><a href="/cadastro.html">Cadastro</a></li>
-          <li><a href="http://127.0.0.1:8000/docs" target="_blank">API</a></li>
+          <li><a href="#" target="_blank" data-api-docs-link>API</a></li>
         </ul>
       </div>
     </div>
@@ -94,6 +94,7 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/web-files/bootstrap.min.js"></script>
+  <script src="/config.js"></script>
   <script>
     // Máscara para telefone brasileiro
     document.getElementById('phone').addEventListener('input', function(e) {
@@ -119,7 +120,7 @@
       messageDiv.innerHTML = '<div class="alert alert-info">Criando conta...</div>';
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/profiles', {
+        const response = await fetch(getApiUrl('/profiles'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)

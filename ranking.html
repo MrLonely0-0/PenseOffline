@@ -75,6 +75,7 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/config.js"></script>
   <script src="/api-client.js"></script>
   <script>
     function logout() {
@@ -124,7 +125,7 @@
     async function loadRanking() {
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const res = await fetch('http://127.0.0.1:8000/users', {
+        const res = await fetch(getApiUrl('/users'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 

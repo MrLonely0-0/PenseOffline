@@ -3,7 +3,19 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) ? window.PENSEOFFLINE_API_URL : "http://127.0.0.1:8000";
+// Usar a configuração do config.js se disponível, senão usar fallback
+// NOTA: config.js deve ser carregado ANTES deste arquivo
+let API_URL;
+if (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) {
+  // Usar configuração do config.js
+  API_URL = window.PENSEOFFLINE_API_URL;
+  console.log('[APIClient] Usando URL da configuração:', API_URL);
+} else {
+  // Fallback para desenvolvimento local
+  API_URL = "http://127.0.0.1:8000";
+  console.log('[APIClient] AVISO: config.js não carregado, usando fallback:', API_URL);
+}
+
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";
 

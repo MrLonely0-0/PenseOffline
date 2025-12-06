@@ -60,7 +60,7 @@
           <li><a href="/">Início</a></li>
           <li class="active"><a href="/perfil.html">Perfil</a></li>
           <li><a href="/cadastro.html">Cadastro</a></li>
-          <li><a href="http://127.0.0.1:8000/docs" target="_blank">API</a></li>
+          <li><a href="#" target="_blank" data-api-docs-link>API</a></li>
         </ul>
       </div>
     </div>
@@ -149,6 +149,7 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/web-files/bootstrap.min.js"></script>
+  <script src="/config.js"></script>
   <script src="/api-client.js"></script>
   <script>
     let currentUser = null;
@@ -229,7 +230,7 @@
         const email = document.getElementById('edit-email').value;
         const phone = document.getElementById('edit-phone').value;
 
-        const response = await fetch('http://127.0.0.1:8000/users/me?name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone), {
+        const response = await fetch(getApiUrl('/users/me?name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone)), {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -262,7 +263,7 @@
 
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const response = await fetch('http://127.0.0.1:8000/users/me', {
+        const response = await fetch(getApiUrl('/users/me'), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
