@@ -60,25 +60,39 @@ Se você está usando Render, Railway ou Heroku para o backend:
 4. Copie a **Connection String** (URI mode)
 5. Substitua `[YOUR-PASSWORD]` pela senha do banco
 
-### 4. Deploy do Frontend no Vercel
+### 4. Configurar URL do Backend no Frontend
+
+Você tem duas opções para configurar a URL do backend no frontend:
+
+#### Opção A: Usando config.js (Recomendado)
+
+1. Edite o arquivo `config.js` na raiz do projeto
+2. Descomente e configure a URL do backend:
+
+```javascript
+window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+```
+
+3. Commit e push as alterações
+
+#### Opção B: Variáveis de Ambiente do Vercel
+
+1. No dashboard do Vercel, vá em **Settings** → **Environment Variables**
+2. Adicione:
+   - **Name**: `PENSEOFFLINE_API_URL`
+   - **Value**: `https://seu-backend.onrender.com`
+
+**Nota**: A Opção A é mais simples pois não requer reconstrução do projeto no Vercel.
+
+### 5. Deploy no Vercel
 
 1. Conecte seu repositório ao Vercel
-2. Configure as seguintes variáveis de ambiente no Vercel:
+2. Configure as build settings (geralmente detectadas automaticamente)
+3. Deploy!
 
-```
-PENSEOFFLINE_API_URL=https://seu-backend.onrender.com
-```
+O Vercel irá automaticamente servir os arquivos HTML estáticos.
 
-Ou adicione um script inline no HTML para configurar antes de carregar o api-client.js:
-
-```html
-<script>
-  window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
-</script>
-<script src="/api-client.js"></script>
-```
-
-### 5. Verificar Configuração
+### 6. Verificar Configuração
 
 Após o deploy:
 
