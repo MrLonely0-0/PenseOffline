@@ -7,6 +7,7 @@ from pathlib import Path
 from sqlmodel import select, Session
 from typing import List
 from datetime import datetime
+import os
 
 from .database import init_db, get_session
 from .models import UserProfile, UserPublic, UserCreate, UserLogin, Token
@@ -18,9 +19,30 @@ from .routers import communities, events, users
 app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, redoc_url=None, openapi_url=None)
 
 # Configurar CORS para permitir requisições do frontend
+# Lê origens permitidas de variável de ambiente (separadas por vírgula)
+# Exemplo: CORS_ORIGINS="https://yourapp.vercel.app,https://www.yourapp.com"
+cors_origins_str = os.getenv("CORS_ORIGINS", "")
+if cors_origins_str:
+    # Se CORS_ORIGINS está definida, use apenas essas origens
+    allowed_origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+else:
+    # Fallback para desenvolvimento local
+    allowed_origins = [
+        "http://127.0.0.1:8080",
+        "http://localhost:8080",
+        "http://127.0.0.1:5173",
+        "http://localhost:5173"
+    ]
+
+# Em produção, se CORS_ORIGINS não foi definida, permitir todas as origens
+# (isso é necessário para Vercel, mas idealmente deve-se configurar CORS_ORIGINS)
+if not cors_origins_str and os.getenv("ENVIRONMENT") == "production":
+    allowed_origins = ["*"]
+    print("WARNING: CORS is allowing all origins. Set CORS_ORIGINS environment variable for better security.")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
