@@ -12,11 +12,16 @@ O backend agora aceita configuração de CORS via variável de ambiente `CORS_OR
 
 #### Backend (Render/Railway/Heroku)
 
-Adicione esta variável de ambiente:
+Adicione estas variáveis de ambiente:
 
+**Obrigatórias:**
 ```
+DATABASE_URL=postgresql://postgres:senha@db.abc123.supabase.co:5432/postgres
 CORS_ORIGINS=https://seu-app.vercel.app
+ENVIRONMENT=production
 ```
+
+⚠️ **IMPORTANTE**: `CORS_ORIGINS` é obrigatória em produção por segurança.
 
 Se tiver múltiplos domínios:
 

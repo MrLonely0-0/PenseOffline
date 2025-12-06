@@ -24,16 +24,6 @@ Defina a variável `CORS_ORIGINS` com as origens permitidas, separadas por vírg
 CORS_ORIGINS=https://seu-app.vercel.app,https://www.seu-app.com
 ```
 
-#### Opção B: Usar ENVIRONMENT=production (Fallback)
-
-Se você não puder configurar `CORS_ORIGINS`, defina:
-
-```
-ENVIRONMENT=production
-```
-
-Isso permitirá todas as origens automaticamente (menos seguro, mas funcional).
-
 ### 2. Configurar Backend no Render/Railway/Heroku
 
 Se você está usando Render, Railway ou Heroku para o backend:
@@ -45,12 +35,14 @@ Se você está usando Render, Railway ou Heroku para o backend:
 **Obrigatórias:**
 - `DATABASE_URL`: String de conexão do Supabase
   - Exemplo: `postgresql://postgres:SUA_SENHA@db.PROJECT_ID.supabase.co:5432/postgres`
-- `CORS_ORIGINS`: Domínio(s) do frontend Vercel
+- `CORS_ORIGINS`: Domínio(s) do frontend Vercel **(OBRIGATÓRIO EM PRODUÇÃO)**
   - Exemplo: `https://seu-app.vercel.app`
+- `ENVIRONMENT`: `production` (para indicar ambiente de produção)
 
 **Opcional:**
-- `ENVIRONMENT`: `production`
 - `SECRET_KEY`: Chave secreta para JWT (gere uma aleatória)
+
+**⚠️ IMPORTANTE**: Em ambiente de produção (`ENVIRONMENT=production`), a variável `CORS_ORIGINS` é **obrigatória**. O backend não iniciará sem ela por questões de segurança.
 
 ### 3. Obter Credenciais do Supabase
 

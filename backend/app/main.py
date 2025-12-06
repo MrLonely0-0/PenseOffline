@@ -8,12 +8,17 @@ from sqlmodel import select, Session
 from typing import List
 from datetime import datetime
 import os
+import logging
 
 from .database import init_db, get_session
 from .models import UserProfile, UserPublic, UserCreate, UserLogin, Token
 from .email_service import send_welcome_email
 from .auth import hash_password, verify_password, create_access_token, get_current_user, user_to_public, SECRET_KEY, decode_token
 from .routers import communities, events, users
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Ocultar documentação OpenAPI/Swagger em ambientes públicos
 app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, redoc_url=None, openapi_url=None)
@@ -22,23 +27,27 @@ app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, red
 # Lê origens permitidas de variável de ambiente (separadas por vírgula)
 # Exemplo: CORS_ORIGINS="https://yourapp.vercel.app,https://www.yourapp.com"
 cors_origins_str = os.getenv("CORS_ORIGINS", "")
+environment = os.getenv("ENVIRONMENT", "development")
+
 if cors_origins_str:
     # Se CORS_ORIGINS está definida, use apenas essas origens
     allowed_origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+    logger.info(f"CORS configured with specific origins: {allowed_origins}")
+elif environment == "production":
+    # Em produção, exigir que CORS_ORIGINS seja definida
+    logger.error("CRITICAL: CORS_ORIGINS not set in production environment!")
+    logger.error("Please set CORS_ORIGINS environment variable with your frontend domain(s).")
+    logger.error("Example: CORS_ORIGINS=https://yourapp.vercel.app")
+    raise ValueError("CORS_ORIGINS must be set in production. See logs for details.")
 else:
-    # Fallback para desenvolvimento local
+    # Fallback apenas para desenvolvimento local
     allowed_origins = [
         "http://127.0.0.1:8080",
         "http://localhost:8080",
         "http://127.0.0.1:5173",
         "http://localhost:5173"
     ]
-
-# Em produção, se CORS_ORIGINS não foi definida, permitir todas as origens
-# (isso é necessário para Vercel, mas idealmente deve-se configurar CORS_ORIGINS)
-if not cors_origins_str and os.getenv("ENVIRONMENT") == "production":
-    allowed_origins = ["*"]
-    print("WARNING: CORS is allowing all origins. Set CORS_ORIGINS environment variable for better security.")
+    logger.info("CORS configured for local development")
 
 app.add_middleware(
     CORSMiddleware,
