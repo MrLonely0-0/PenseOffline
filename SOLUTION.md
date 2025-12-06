@@ -15,7 +15,8 @@
 - ✅ Mensagens de erro claras
 
 ### 2. Configuração Frontend Simplificada
-- ✅ Arquivo `config.js` para definir URL da API
+- ✅ **Detecção automática** de ambiente (localhost vs produção)
+- ✅ Arquivo `config.js` opcional para backend em servidor separado
 - ✅ Incluído em todas as páginas HTML
 - ✅ Comentários explicativos
 
@@ -26,7 +27,7 @@
 
 ## 🔧 Como Usar
 
-### Backend (Render/Railway/Heroku)
+### Backend (Render/Railway/Heroku ou Vercel)
 ```env
 # OBRIGATÓRIO
 DATABASE_URL=postgresql://postgres:senha@db.xxx.supabase.co:5432/postgres
@@ -38,7 +39,10 @@ SECRET_KEY=sua-chave-secreta-aleatoria-32-caracteres
 ```
 
 ### Frontend (Vercel)
-Editar `config.js`:
+
+✅ **Detecção automática!** Nenhuma configuração necessária se backend e frontend estão ambos no Vercel.
+
+⚙️ **Apenas se backend em servidor separado** (Render/Railway), edite `config.js`:
 ```javascript
 window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
 ```
@@ -75,7 +79,8 @@ window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
 - `backend/.env.example` - Template completo
 
 ### Frontend
-- `config.js` - Configuração da API (NOVO)
+- `api-client.js` - **Detecção automática** de ambiente (localhost vs produção)
+- `config.js` - Configuração opcional da API (NOVO)
 - `login.html` - Inclui config.js
 - `dashboard.html` - Inclui config.js
 - `desafios.html` - Inclui config.js

@@ -54,9 +54,21 @@ Se você está usando Render, Railway ou Heroku para o backend:
 
 ### 4. Configurar URL do Backend no Frontend
 
-Você tem duas opções para configurar a URL do backend no frontend:
+✅ **NOVIDADE: Detecção Automática!**
 
-#### Opção A: Usando config.js (Recomendado)
+O frontend agora detecta automaticamente o ambiente:
+- **Localhost**: Usa `http://127.0.0.1:8000` automaticamente
+- **Produção**: Usa a mesma origem do frontend por padrão
+
+**Você só precisa configurar se o backend estiver em um servidor diferente do frontend.**
+
+#### Cenário 1: Backend e Frontend no Vercel (Recomendado)
+
+✅ **Nenhuma configuração necessária!** O frontend automaticamente usará a mesma URL.
+
+#### Cenário 2: Backend em Render/Railway, Frontend no Vercel
+
+##### Opção A: Usando config.js (Recomendado)
 
 1. Edite o arquivo `config.js` na raiz do projeto
 2. Descomente e configure a URL do backend:
@@ -67,7 +79,7 @@ window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
 
 3. Commit e push as alterações
 
-#### Opção B: Variáveis de Ambiente do Vercel
+##### Opção B: Variáveis de Ambiente do Vercel
 
 1. No dashboard do Vercel, vá em **Settings** → **Environment Variables**
 2. Adicione:
@@ -90,8 +102,9 @@ Após o deploy:
 
 1. Abra o DevTools do navegador (F12)
 2. Vá para a aba **Console**
-3. Tente fazer login ou cadastro
-4. Verifique se há erros de CORS
+3. Digite `API_URL` para ver qual URL está sendo usada
+4. Tente fazer login ou cadastro
+5. Verifique se há erros de CORS
 
 Se ainda houver erros:
 - Verifique se as variáveis de ambiente foram salvas corretamente

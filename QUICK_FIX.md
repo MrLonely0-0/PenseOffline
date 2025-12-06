@@ -31,7 +31,14 @@ CORS_ORIGINS=https://seu-app.vercel.app,https://www.seu-app.com
 
 #### Frontend (Vercel)
 
-Edite o arquivo `config.js` e descomente/configure:
+✅ **DETECÇÃO AUTOMÁTICA**: O frontend agora detecta automaticamente se está em localhost ou produção!
+
+- **Localhost**: Usa `http://127.0.0.1:8000` automaticamente
+- **Produção**: Usa a mesma origem do frontend (ex: `https://seu-app.vercel.app`)
+
+⚙️ **Configuração Manual** (apenas se backend em servidor separado):
+
+Se seu backend está no Render/Railway (não no Vercel), edite `config.js`:
 
 ```javascript
 window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
@@ -39,8 +46,20 @@ window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
 
 ### 3. Exemplo Completo
 
-**Backend no Render:**
+**Cenário 1: Backend no Vercel (junto com frontend)**
 ```env
+# Backend
+DATABASE_URL=postgresql://postgres:senha@db.abc123.supabase.co:5432/postgres
+CORS_ORIGINS=https://penseoffline.vercel.app
+ENVIRONMENT=production
+
+# Frontend
+# Nenhuma configuração necessária! ✅ Detecção automática
+```
+
+**Cenário 2: Backend no Render, Frontend no Vercel**
+```env
+# Backend (Render)
 DATABASE_URL=postgresql://postgres:senha@db.abc123.supabase.co:5432/postgres
 CORS_ORIGINS=https://penseoffline.vercel.app
 ENVIRONMENT=production

@@ -3,7 +3,32 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) ? window.PENSEOFFLINE_API_URL : "http://127.0.0.1:8000";
+// Detecta automaticamente se está rodando em localhost ou em produção
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+// Configuração automática da URL da API:
+// - Em localhost: usa http://127.0.0.1:8000 (backend local)
+// - Em produção: usa window.PENSEOFFLINE_API_URL se definido, senão assume backend na mesma origem
+// 
+// Para configurar em produção com backend separado (ex: Render):
+// Adicione no config.js: window.PENSEOFFLINE_API_URL = 'https://seu-backend.onrender.com';
+let API_URL;
+if (typeof window !== 'undefined') {
+  if (window.PENSEOFFLINE_API_URL) {
+    // Configuração manual (config.js ou variável de ambiente)
+    API_URL = window.PENSEOFFLINE_API_URL;
+  } else if (isLocalhost) {
+    // Desenvolvimento local: backend na porta 8000
+    API_URL = "http://127.0.0.1:8000";
+  } else {
+    // Produção: assume backend na mesma origem (tudo no Vercel)
+    API_URL = window.location.origin;
+  }
+} else {
+  API_URL = "http://127.0.0.1:8000";
+}
+
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";
 
