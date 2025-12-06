@@ -18,12 +18,18 @@ if (typeof window !== 'undefined') {
   if (window.PENSEOFFLINE_API_URL) {
     // Configuração manual (config.js ou variável de ambiente)
     API_URL = window.PENSEOFFLINE_API_URL;
+    console.log('[PenseOffline] API URL configurada manualmente:', API_URL);
   } else if (isLocalhost) {
     // Desenvolvimento local: backend na porta 8000
     API_URL = "http://127.0.0.1:8000";
+    console.log('[PenseOffline] Ambiente detectado: DESENVOLVIMENTO (localhost)');
+    console.log('[PenseOffline] API URL:', API_URL);
   } else {
     // Produção: assume backend na mesma origem (tudo no Vercel)
     API_URL = window.location.origin;
+    console.log('[PenseOffline] Ambiente detectado: PRODUÇÃO');
+    console.log('[PenseOffline] API URL (mesma origem):', API_URL);
+    console.log('[PenseOffline] Se o backend estiver em servidor separado, configure window.PENSEOFFLINE_API_URL em config.js');
   }
 } else {
   API_URL = "http://127.0.0.1:8000";
