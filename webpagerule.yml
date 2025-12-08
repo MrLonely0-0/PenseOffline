@@ -1,0 +1,9 @@
+- adx_name: Conceder Alteração para Administradores
+  adx_right: 1
+  adx_webpageaccesscontrolrule_webrole:
+  - d049688b-d360-4d43-a7d5-6be535dc4652
+  adx_webpageaccesscontrolruleid: 64fa5e24-effc-4ff4-a1b3-538a2c2d0a9b
+  adx_webpageid: 2f64b27c-2ada-49fc-b827-7cd19cf65197
+- adx_name: Conceder Alteração para Conteúdo
+  adx_right: 1
+  adx_webpageaccesscontrolruleid: bc3cac28-0a12-43f8-8b26-6e7ef3790794

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <style>
+    body { padding-top: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; }
+    .login-container { max-width: 450px; margin: 0 auto; }
+    .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    .logo { text-align: center; margin-bottom: 30px; }
+    .logo h1 { color: #667eea; margin: 0; }
+    .form-control { height: 45px; }
+    .btn-login { width: 100%; height: 45px; background: #667eea; border: none; font-size: 16px; font-weight: 600; }
+    .btn-login:hover { background: #5568d3; }
+    .divider { text-align: center; margin: 20px 0; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-container">
+      <div class="login-box">
+        <div class="logo">
+          <h1>📵 Pense Offline</h1>
+          <p style="color: #666;">Reduza seu tempo de tela</p>
+        </div>
+
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 20px;">
+          <li role="presentation" class="active"><a href="#login" role="tab" data-toggle="tab">Entrar</a></li>
+          <li role="presentation"><a href="#register" role="tab" data-toggle="tab">Cadastrar</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Login Tab -->
+          <div role="tabpanel" class="tab-pane active" id="login">
+            <form id="loginForm">
+              <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Usuário" required>
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Senha" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-login">Entrar</button>
+            </form>
+          </div>
+
+          <!-- Register Tab -->
+          <div role="tabpanel" class="tab-pane" id="register">
+            <form id="registerForm">
+              <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Nome de usuário" required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="name" placeholder="Nome completo" required>
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <input type="tel" class="form-control" name="phone" placeholder="(XX) XXXXX-XXXX">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Senha" required minlength="6">
+              </div>
+              <button type="submit" class="btn btn-primary btn-login">Criar Conta</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="message" style="margin-top: 15px;"></div>
+
+        <div class="divider">OU</div>
+        <p style="text-align: center;"><a href="/">Voltar para página inicial</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    // Redirecionar se já autenticado
+    document.addEventListener('DOMContentLoaded', function() {
+      if (api.isAuthenticated()) {
+        window.location.href = '/dashboard.html';
+      }
+    });
+
+    // Máscara telefone
+    document.querySelector('[name="phone"]').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+      }
+      e.target.value = value;
+    });
+
+    function showMessage(message, isError = false) {
+      const messageDiv = document.getElementById('message');
+      const alertClass = isError ? 'alert alert-danger' : 'alert alert-success';
+      messageDiv.innerHTML = '<div class="' + alertClass + '">' + message + '</div>';
+    }
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = e.target.querySelector('button');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Carregando...';
+      
+      try {
+        const username = document.querySelector('#login [name="username"]').value;
+        const password = document.querySelector('#login [name="password"]').value;
+        
+        await api.login(username, password);
+        showMessage('Login realizado com sucesso!', false);
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 1000);
+      } catch (error) {
+        showMessage(error.message || 'Erro ao fazer login. Verifique suas credenciais.', true);
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+
+    // Register
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = e.target.querySelector('button');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Criando conta...';
+      
+      try {
+        const username = document.querySelector('#register [name="username"]').value;
+        const name = document.querySelector('#register [name="name"]').value;
+        const email = document.querySelector('#register [name="email"]').value;
+        const phone = document.querySelector('#register [name="phone"]').value;
+        const password = document.querySelector('#register [name="password"]').value;
+        
+        // Validações básicas
+        if (username.length < 3 || username.length > 30) {
+          throw new Error('Usuário deve ter entre 3 e 30 caracteres');
+        }
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+          throw new Error('Usuário pode conter apenas letras, números, _ e -');
+        }
+        if (password.length < 6) {
+          throw new Error('Senha deve ter no mínimo 6 caracteres');
+        }
+        
+        await api.register({
+          username,
+          name,
+          email,
+          phone: phone || null,
+          password
+        });
+        
+        showMessage('Conta criada com sucesso! Redirecionando...', false);
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 1000);
+      } catch (error) {
+        showMessage(error.message || 'Erro ao criar conta', true);
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+  </script>
+</body>
+</html>

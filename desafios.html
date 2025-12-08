@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafios - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <style>
+    .navbar { margin-bottom: 30px; }
+    .challenge-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.2s; }
+    .challenge-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+    .challenge-icon { font-size: 48px; margin-bottom: 15px; }
+    .challenge-points { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; display: inline-block; }
+    .btn-complete { width: 100%; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">📵 Pense Offline</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/dashboard.html">Dashboard</a></li>
+          <li class="active"><a href="/desafios.html">Desafios</a></li>
+          <li><a href="/ranking.html">Ranking</a></li>
+          <li><a href="/perfil.html">Perfil</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" id="username-display"></a></li>
+          <li><a href="#" onclick="logout()">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>🎯 Desafios Disponíveis</h1>
+    <p class="lead">Complete desafios e ganhe pontos para subir de nível!</p>
+
+    <div class="row" style="margin-top: 30px;">
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">📱</div>
+          <h3>1 Hora Sem Redes Sociais</h3>
+          <p>Fique 1 hora sem acessar Instagram, Facebook, TikTok ou Twitter.</p>
+          <span class="challenge-points">+50 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(50, '1 Hora Sem Redes Sociais')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">📵</div>
+          <h3>3 Horas Sem Celular</h3>
+          <p>Deixe seu celular de lado por 3 horas completas. Desative as notificações!</p>
+          <span class="challenge-points">+150 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(150, '3 Horas Sem Celular')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">🌙</div>
+          <h3>Noite Sem Telas</h3>
+          <p>Não use dispositivos eletrônicos 2 horas antes de dormir.</p>
+          <span class="challenge-points">+100 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(100, 'Noite Sem Telas')">Completar Desafio</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">📚</div>
+          <h3>Dia de Leitura</h3>
+          <p>Substitua 2 horas de tela por leitura de um livro físico.</p>
+          <span class="challenge-points">+200 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(200, 'Dia de Leitura')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">🏃</div>
+          <h3>Exercício ao Ar Livre</h3>
+          <p>Faça 1 hora de atividade física ao ar livre sem usar o celular.</p>
+          <span class="challenge-points">+250 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(250, 'Exercício ao Ar Livre')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">🎨</div>
+          <h3>Hobby Criativo</h3>
+          <p>Dedique 2 horas a um hobby offline: desenho, música, artesanato...</p>
+          <span class="challenge-points">+300 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(300, 'Hobby Criativo')">Completar Desafio</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">👨‍👩‍👧</div>
+          <h3>Tempo em Família</h3>
+          <p>Passe 3 horas com família/amigos sem usar celular.</p>
+          <span class="challenge-points">+350 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(350, 'Tempo em Família')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">🌅</div>
+          <h3>Manhã Desconectada</h3>
+          <p>Não use nenhum dispositivo eletrônico até 10h da manhã.</p>
+          <span class="challenge-points">+400 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(400, 'Manhã Desconectada')">Completar Desafio</button>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="challenge-card">
+          <div class="challenge-icon">🔥</div>
+          <h3>24h Sem Telas</h3>
+          <p>O desafio supremo! Fique um dia inteiro sem dispositivos eletrônicos.</p>
+          <span class="challenge-points">+1000 pontos</span>
+          <button class="btn btn-success btn-complete" onclick="completeChallenge(1000, '24h Sem Telas')">Completar Desafio</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    // Redirecionar se não autenticado
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!api.isAuthenticated()) {
+        window.location.href = '/login.html';
+      }
+      loadUser();
+      loadCommunities();
+    });
+
+    async function completeChallenge(pontos, nome) {
+      if (!confirm(`Você realmente completou o desafio "${nome}"?`)) return;
+
+      try {
+        const token = localStorage.getItem('pensOffline_token');
+        const res = await fetch('http://127.0.0.1:8000/rewards/complete-challenge', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ pontos, nome_desafio: nome })
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          alert(`🎉 Parabéns! ${result.message}\n✨ Você ganhou ${pontos} pontos!\n📊 Total: ${result.pontos_totais} pontos\n🏆 Nível: ${result.nivel}`);
+        } else {
+          const error = await res.json();
+          alert('Erro: ' + (error.detail || 'Erro ao completar desafio'));
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao conectar com servidor');
+      }
+    }
+
+    async function loadUser() {
+      try {
+        const user = await api.getCurrentUser();
+        document.getElementById('username-display').textContent = '@' + user.username;
+      } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+      }
+    }
+
+    async function loadCommunities() {
+      try {
+        const communities = await api.getCommunities();
+        displayCommunities(communities);
+      } catch (error) {
+        console.error('Erro ao carregar comunidades:', error);
+      }
+    }
+
+    function displayCommunities(communities) {
+      if (communities.length === 0) return;
+      
+      const container = document.querySelector('.container');
+      const section = document.createElement('div');
+      section.style.marginTop = '50px';
+      section.innerHTML = `
+        <h2>🏘️ Comunidades</h2>
+        <p class="lead">Junte-se a comunidades e complete desafios em grupo!</p>
+        <div class="row" id="communities-list"></div>
+      `;
+      
+      const list = section.querySelector('#communities-list');
+      communities.forEach(community => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4';
+        card.innerHTML = `
+          <div class="challenge-card">
+            <h3>${community.name}</h3>
+            <p>${community.description}</p>
+            <p><small>👥 ${community.member_count || 0} membros</small></p>
+            <button class="btn btn-primary btn-block" onclick="joinCommunity(${community.id})">
+              Entrar na Comunidade
+            </button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+      
+      container.appendChild(section);
+    }
+
+    async function joinCommunity(id) {
+      try {
+        await api.joinCommunity(id);
+        alert('✅ Você entrou na comunidade!');
+        location.reload();
+      } catch (error) {
+        alert('Erro: ' + (error.message || 'Erro ao entrar na comunidade'));
+      }
+    }
+
+    function logout() {
+      api.logout();
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

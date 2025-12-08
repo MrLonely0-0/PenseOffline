@@ -1,0 +1,23 @@
+# Render deployment manifest (blueprint) for Desafio Positivo backend
+# Use this file when importing the repository to Render using Infrastructure as Code
+
+services:
+  - type: web
+    name: desafio-positivo-backend
+    env: docker
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health/
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: 'False'
+      - key: DATABASE_ENGINE
+        value: 'postgresql'
+
+

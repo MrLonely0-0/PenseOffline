@@ -1,0 +1,15 @@
+adx_accountrelationship: 
+adx_append: false
+adx_appendto: false
+adx_contactrelationship: 
+adx_create: true
+adx_delete: false
+adx_entitylogicalname: cr5c2_contausuario1d13
+adx_entityname: Copilot ContaUsuario 1d13
+adx_entitypermission_webrole: []
+adx_entitypermissionid: 0539bf33-3673-48e6-ae16-df359383146c
+adx_parententitypermission: 
+adx_parentrelationship: 
+adx_read: false
+adx_scope: 756150000
+adx_write: false

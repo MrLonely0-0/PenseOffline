@@ -1,0 +1,14 @@
+- adx_managecontentsnippets: true
+  adx_managesitemarkers: true
+  adx_manageweblinksets: true
+  adx_name: Permissões administrativas para o Modelo em Branco
+  adx_previewunpublishedentities: true
+  adx_websiteaccess_webrole:
+  - d049688b-d360-4d43-a7d5-6be535dc4652
+  adx_websiteaccessid: 290ed7bf-7eec-4a9d-b0b0-28a3af10e32b
+- adx_managecontentsnippets: false
+  adx_managesitemarkers: false
+  adx_manageweblinksets: false
+  adx_name: Visualizar permissão para o Modelo em Branco
+  adx_previewunpublishedentities: true
+  adx_websiteaccessid: d29857b3-2988-440f-9920-ce28d0661952

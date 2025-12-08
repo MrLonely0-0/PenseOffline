@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portal - Desafio Positivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/theme.css" />
+  <style>
+    body { padding:2rem; }
+    header { margin-bottom:2rem; }
+    .profiles-list li { margin:0.25rem 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Portal (Local)</h1>
+    <p>Status backend: <span id="status">verificando...</span></p>
+  </header>
+  <section>
+    <h2>Perfis de Usuário</h2>
+    <p>Total: <span id="total">0</span></p>
+    <ul id="profiles" class="profiles-list"></ul>
+  </section>
+  <section style="margin-top:2rem;">
+    <h2>Criar Perfil</h2>
+    <form id="createForm">
+      <div class="mb-2"><input class="form-control" name="name" placeholder="Nome" required /></div>
+      <div class="mb-2"><input class="form-control" name="email" placeholder="Email" required type="email" /></div>
+      <div class="mb-2"><input class="form-control" name="phone" placeholder="Telefone" required /></div>
+      <button class="btn btn-primary" type="submit">Salvar</button>
+    </form>
+  </section>
+  <script>
+    async function refreshStatus(){
+      try{ const r = await fetch('/health'); const j = await r.json(); document.getElementById('status').textContent = j.status || 'ok'; }
+      catch(e){ document.getElementById('status').textContent = 'erro'; }
+    }
+    async function loadProfiles(){
+      try{ const r = await fetch('/profiles'); const arr = await r.json(); const ul = document.getElementById('profiles'); ul.innerHTML=''; arr.forEach(p=>{ const li=document.createElement('li'); li.textContent = `${p.id} - ${p.name} (${p.email})`; ul.appendChild(li); }); document.getElementById('total').textContent = arr.length; }
+      catch(e){ console.error(e); }
+    }
+    document.getElementById('createForm').addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const fd = new FormData(ev.target);
+      const body = Object.fromEntries(fd.entries());
+      try{
+        const r = await fetch('/profiles', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        if(r.ok){ ev.target.reset(); loadProfiles(); }
+      }catch(e){ console.error(e); }
+    });
+    refreshStatus();
+    loadProfiles();
+  </script>
+</body>
+</html>

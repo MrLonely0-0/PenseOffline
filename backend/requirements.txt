@@ -1,0 +1,15 @@
+fastapi==0.115.0
+uvicorn==0.30.0
+sqlmodel==0.0.16
+pydantic==2.6.4
+aiosmtplib
+email-validator
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Postgres driver for deployment to Supabase
+psycopg2-binary
+
+# Environment variables loading
+python-dotenv

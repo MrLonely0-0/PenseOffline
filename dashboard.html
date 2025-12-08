@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <style>
+    .navbar { margin-bottom: 30px; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+    .stat-card h2 { margin: 0; font-size: 48px; font-weight: bold; }
+    .stat-card p { margin: 10px 0 0 0; opacity: 0.9; }
+    .level-badge { display: inline-block; background: gold; color: #333; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+    .progress-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .btn-logout { background: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">📵 Pense Offline</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/dashboard.html">Dashboard</a></li>
+          <li><a href="/desafios.html">Desafios</a></li>
+          <li><a href="/ranking.html">Ranking</a></li>
+          <li><a href="/perfil.html">Perfil</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" id="username-display"></a></li>
+          <li><a href="#" onclick="logout()">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Bem-vindo, <span id="user-name"></span>!</h1>
+    
+    <div class="row" style="margin-top: 30px;">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <h2 id="pontos">0</h2>
+          <p>Pontos</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <h2 id="nivel">1</h2>
+          <p>Nível</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          <h2 id="tempo">0</h2>
+          <p>Horas sem tela</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+          <h2 id="dias">0</h2>
+          <p>Dias consecutivos</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 30px;">
+      <div class="col-md-6">
+        <div class="progress-section">
+          <h3>📊 Registrar Tempo Sem Tela</h3>
+          <p>Quanto tempo você ficou longe das telas hoje?</p>
+          <form id="addTimeForm">
+            <div class="form-group">
+              <label>Minutos sem tela:</label>
+              <input type="number" class="form-control" name="minutos" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-success">Adicionar Tempo (+10 pontos por hora)</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="progress-section">
+          <h3>🏆 Desafios Completados</h3>
+          <h2 style="color: #667eea;" id="desafios">0</h2>
+          <p>desafios concluídos</p>
+          <a href="/desafios.html" class="btn btn-primary">Ver Desafios Disponíveis</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-section" style="margin-top: 30px;">
+      <h3>📈 Progresso para Próximo Nível</h3>
+      <div class="progress" style="height: 30px;">
+        <div class="progress-bar progress-bar-striped active" id="progress-bar" role="progressbar" style="width: 0%;">
+          <span id="progress-text">0 / 100 pontos</span>
+        </div>
+      </div>
+      <p style="margin-top: 10px; color: #666;">Você precisa de <strong id="pontos-faltando">100</strong> pontos para o próximo nível!</p>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    // Redirecionar se não autenticado
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!api.isAuthenticated()) {
+        window.location.href = '/login.html';
+      }
+      loadUserData();
+    });
+
+    async function loadUserData() {
+      try {
+        const user = await api.getCurrentUser();
+        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('username-display').textContent = '@' + user.username;
+        document.getElementById('pontos').textContent = user.pontos;
+        document.getElementById('nivel').textContent = user.nivel;
+        document.getElementById('tempo').textContent = Math.floor(user.tempo_sem_tela_minutos / 60);
+        document.getElementById('dias').textContent = user.dias_consecutivos;
+        document.getElementById('desafios').textContent = user.desafios_completados;
+
+        // Progresso
+        const pontosNoNivel = user.pontos % 100;
+        const percent = pontosNoNivel;
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-text').textContent = pontosNoNivel + ' / 100 pontos';
+        document.getElementById('pontos-faltando').textContent = 100 - pontosNoNivel;
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        api.logout();
+        window.location.href = '/login.html';
+      }
+    }
+
+    document.getElementById('addTimeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = e.target.querySelector('button');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Adicionando...';
+
+      try {
+        const formData = new FormData(e.target);
+        const minutos = parseInt(formData.get('minutos'));
+
+        const result = await api.addScreenFreeTime(minutos);
+        alert(`✅ Tempo adicionado!\n🎉 Você ganhou ${result.pontos_ganhos || 10} pontos!`);
+        e.target.reset();
+        loadUserData();
+      } catch (error) {
+        alert('Erro ao adicionar tempo: ' + (error.message || 'Erro desconhecido'));
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+
+    function logout() {
+      api.logout();
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

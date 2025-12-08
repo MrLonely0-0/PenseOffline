@@ -1,0 +1,198 @@
+ <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking - Pense Offline</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <style>
+    .navbar { margin-bottom: 30px; }
+    .ranking-table { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white; }
+    .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%); color: white; }
+    .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); color: white; }
+    .medal { font-size: 24px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">📵 Pense Offline</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/dashboard.html">Dashboard</a></li>
+          <li><a href="/desafios.html">Desafios</a></li>
+          <li class="active"><a href="/ranking.html">Ranking</a></li>
+          <li><a href="/perfil.html">Perfil</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" id="username-display"></a></li>
+          <li><a href="#" onclick="logout()">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>🏆 Ranking Global</h1>
+    <p class="lead">Os melhores na redução do tempo de tela!</p>
+
+    <div class="ranking-table" style="margin-top: 30px;">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th width="80">Posição</th>
+            <th>Usuário</th>
+            <th>Pontos</th>
+            <th>Nível</th>
+            <th>Tempo Sem Tela</th>
+            <th>Desafios</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-body">
+          <tr>
+            <td colspan="6" class="text-center">Carregando ranking...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center;">
+      <h3>Sua Posição</h3>
+      <div id="user-position" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: inline-block; min-width: 400px;">
+        <p>Carregando...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return null;
+      }
+      return token;
+    }
+
+    function getMedal(position) {
+      if (position === 1) return '<span class="medal">🥇</span>';
+      if (position === 2) return '<span class="medal">🥈</span>';
+      if (position === 3) return '<span class="medal">🥉</span>';
+      return position + 'º';
+    }
+
+    function getRowClass(position) {
+      if (position === 1) return 'rank-1';
+      if (position === 2) return 'rank-2';
+      if (position === 3) return 'rank-3';
+      return '';
+    }
+
+    // Redirecionar se não autenticado
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!api.isAuthenticated()) {
+        window.location.href = '/login.html';
+      }
+      loadRanking();
+    });
+
+    function getMedal(position) {
+      if (position === 1) return '<span class="medal">🥇</span>';
+      if (position === 2) return '<span class="medal">🥈</span>';
+      if (position === 3) return '<span class="medal">🥉</span>';
+      return position + 'º';
+    }
+
+    async function loadRanking() {
+      try {
+        const token = localStorage.getItem('pensOffline_token');
+        const res = await fetch('http://127.0.0.1:8000/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          const users = await res.json();
+          // Ordenar por pontos decrescente
+          users.sort((a, b) => b.pontos - a.pontos);
+          
+          const tbody = document.getElementById('ranking-body');
+          tbody.innerHTML = '';
+
+          users.forEach((user, index) => {
+            const position = index + 1;
+            const row = `
+              <tr class="${getRowClass(position)}">
+                <td><strong>${getMedal(position)}</strong></td>
+                <td><strong>${user.name}</strong> <small>@${user.username}</small></td>
+                <td><strong>${user.pontos}</strong> pts</td>
+                <td>Nível <strong>${user.nivel}</strong></td>
+                <td>${Math.floor(user.tempo_sem_tela_minutos / 60)}h ${user.tempo_sem_tela_minutos % 60}min</td>
+                <td>${user.desafios_completados}</td>
+              </tr>
+            `;
+            tbody.innerHTML += row;
+          });
+
+          // Carregar posição do usuário atual
+          loadUserPosition(users);
+        } else {
+          logout();
+        }
+      } catch (error) {
+        console.error('Erro ao carregar ranking:', error);
+        document.getElementById('ranking-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erro ao carregar ranking</td></tr>';
+      }
+    }
+
+    async function loadUserPosition(allUsers) {
+      try {
+        const currentUser = await api.getCurrentUser();
+        document.getElementById('username-display').textContent = '@' + currentUser.username;
+
+        // Encontrar posição no ranking
+        const position = allUsers.findIndex(u => u.id === currentUser.id) + 1;
+        const total = allUsers.length;
+
+        const positionDiv = document.getElementById('user-position');
+        if (position > 0) {
+          positionDiv.innerHTML = `
+            <h2 style="color: #667eea; margin: 0;">${position}º lugar</h2>
+            <p style="margin: 10px 0 0 0;">de ${total} participantes</p>
+            <p style="margin: 10px 0 0 0;"><strong>${currentUser.pontos}</strong> pontos | Nível <strong>${currentUser.nivel}</strong></p>
+          `;
+        } else {
+          positionDiv.innerHTML = `
+            <h2 style="color: #667eea; margin: 0;">--</h2>
+            <p style="margin: 10px 0 0 0;">Complete desafios para entrar no ranking!</p>
+          `;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar posição:', error);
+      }
+    }
+
+    function logout() {
+      api.logout();
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>
