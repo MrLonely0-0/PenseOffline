@@ -20,7 +20,15 @@ app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, red
 # Configurar CORS para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:5173"],
+    allow_origins=[
+        "http://127.0.0.1:8080", 
+        "http://localhost:8080", 
+        "http://127.0.0.1:5173", 
+        "http://localhost:5173",
+        "https://pense-offline.vercel.app",
+        "https://*.vercel.app",  # Permite preview deployments do Vercel
+        "*"  # Temporariamente para debug - remover depois
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
