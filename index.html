@@ -73,7 +73,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li class="active"><a href="/">Início</a></li>
           <li><a href="/login.html">Entrar</a></li>
-          <li><a href="http://127.0.0.1:8000/docs" target="_blank">API</a></li>
+          <li><a href="/api/health" target="_blank">API</a></li>
         </ul>
       </div>
     </div>
@@ -209,7 +209,8 @@
     // Carregar estatísticas globais
     async function loadStats() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/stats/global');
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
+        const res = await fetch(`${apiBase}/stats/global`);
         if (res.ok) {
           const stats = await res.json();
           document.getElementById('total-users').textContent = stats.total_usuarios;

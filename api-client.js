@@ -3,12 +3,10 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-// Detectar ambiente automaticamente
-const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) 
-  ? window.PENSEOFFLINE_API_URL 
-  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? "http://127.0.0.1:8000"
-    : `${window.location.origin}/api`;  // Usa a mesma URL do Vercel com /api
+// Detectar ambiente automaticamente (sempre usa /api em produção)
+const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL)
+  ? window.PENSEOFFLINE_API_URL
+  : `${window.location.origin}/api`;
 
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";

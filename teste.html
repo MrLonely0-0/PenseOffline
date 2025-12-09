@@ -74,10 +74,11 @@
     // Teste de status do servidor
     async function testServerStatus() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/health');
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
+        const res = await fetch(`${apiBase}/health`);
         const statusDiv = document.getElementById('server-status');
         if (res.ok) {
-          statusDiv.innerHTML = '<div class="test-result success">✅ Servidor rodando em http://127.0.0.1:8000</div>';
+          statusDiv.innerHTML = `<div class="test-result success">✅ Servidor rodando em ${apiBase}</div>`;
         } else {
           statusDiv.innerHTML = '<div class="test-result error">❌ Servidor retornou status: ' + res.status + '</div>';
         }

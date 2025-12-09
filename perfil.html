@@ -60,7 +60,7 @@
           <li><a href="/">Início</a></li>
           <li class="active"><a href="/perfil.html">Perfil</a></li>
           <li><a href="/cadastro.html">Cadastro</a></li>
-          <li><a href="http://127.0.0.1:8000/docs" target="_blank">API</a></li>
+          <li><a href="/api/health" target="_blank">API</a></li>
         </ul>
       </div>
     </div>
@@ -229,7 +229,8 @@
         const email = document.getElementById('edit-email').value;
         const phone = document.getElementById('edit-phone').value;
 
-        const response = await fetch('http://127.0.0.1:8000/users/me?name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone), {
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
+        const response = await fetch(`${apiBase}/users/me?name=` + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone), {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -262,7 +263,8 @@
 
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const response = await fetch('http://127.0.0.1:8000/users/me', {
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
+        const response = await fetch(`${apiBase}/users/me`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
