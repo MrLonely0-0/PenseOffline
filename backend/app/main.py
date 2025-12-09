@@ -15,9 +15,8 @@ logger = logging.getLogger(__name__)
 
 from .database import init_db, get_session
 from .models import UserProfile, UserPublic, UserCreate, UserLogin, Token
-from .email_service import send_welcome_email
 from .auth import hash_password, verify_password, create_access_token, get_current_user, user_to_public, SECRET_KEY, decode_token
-from .routers import communities, events, users
+from .routers import communities, events, users, notifications
 
 # Ocultar documentação OpenAPI/Swagger em ambientes públicos
 app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, redoc_url=None, openapi_url=None)
@@ -25,16 +24,11 @@ app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, red
 # Configurar CORS para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:5173"],
+    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:8000", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Caminho da pasta web-files (CSS, imagens) fora do backend
-_static_path = Path(__file__).resolve().parents[2] / "web-files"
-if _static_path.exists():
-    app.mount("/static", StaticFiles(directory=str(_static_path)), name="static")
 
 _templates_dir = Path(__file__).parent / "templates"
 
@@ -57,10 +51,11 @@ def on_startup():
         raise
 
 
-# Include routers
+# Include routers ANTES de montar arquivos estáticos
 app.include_router(users.router)
 app.include_router(communities.router)
 app.include_router(events.router)
+app.include_router(notifications.router)
 
 
 # Tornar a API inacessível sem token: middleware que valida presença e validade do token
@@ -71,8 +66,12 @@ PUBLIC_PATHS = ["/", "/health", "/auth/login", "/auth/register", "/users/login",
 @app.middleware("http")
 async def require_auth_for_api(request: Request, call_next):
     path = request.url.path
-    # permitir arquivos estáticos e rotas públicas
-    if path.startswith("/static") or any(path == p or path.startswith(p + "/") for p in PUBLIC_PATHS):
+    # permitir arquivos estáticos, páginas HTML e rotas públicas
+    if (path.startswith("/static") or 
+        path.endswith(".html") or 
+        path.endswith(".js") or 
+        path.endswith(".css") or 
+        any(path == p or path.startswith(p + "/") for p in PUBLIC_PATHS)):
         return await call_next(request)
 
     auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
@@ -219,3 +218,17 @@ def get_global_stats(session: Session = Depends(get_session)):
         "total_tempo_sem_tela_horas": sum(u.tempo_sem_tela_minutos for u in total_users) // 60,
         "total_desafios": sum(u.desafios_completados for u in total_users)
     }
+
+
+# ===== ARQUIVOS ESTÁTICOS (SEMPRE NO FINAL) =====
+# Montar arquivos estáticos APÓS todas as rotas de API
+
+# Pasta web-files (CSS, imagens)
+_static_path = Path(__file__).resolve().parents[2] / "web-files"
+if _static_path.exists():
+    app.mount("/web-files", StaticFiles(directory=str(_static_path)), name="web-files")
+
+# Arquivos da raiz (HTML, JS) - SEMPRE POR ÚLTIMO
+_root_path = Path(__file__).resolve().parents[2]
+if _root_path.exists():
+    app.mount("/", StaticFiles(directory=str(_root_path), html=True), name="root")

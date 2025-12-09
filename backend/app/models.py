@@ -47,6 +47,17 @@ class XPHistory(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+class Notification(SQLModel, table=True):
+    """Notificações do sistema - registra cadastros e eventos importantes"""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: Optional[int] = Field(default=None, foreign_key="userprofile.id")
+    type: str = Field(default="info")  # info, welcome, achievement, etc
+    title: str
+    message: str
+    read: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class UserProfile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)

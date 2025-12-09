@@ -4,7 +4,7 @@ from typing import List, Optional
 import re
 
 from ..database import get_session
-from ..models import UserProfile, UserPublic, UserCreate, UserLogin, Token, XPHistory
+from ..models import UserProfile, UserPublic, UserCreate, UserLogin, Token, XPHistory, Notification
 from ..auth import get_current_user, hash_password, verify_password, create_access_token, user_to_public
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -90,6 +90,16 @@ def register(user_data: UserCreate, session: Session = Depends(get_session)):
     session.add(user)
     session.commit()
     session.refresh(user)
+    
+    # Registrar notificação de boas-vindas no banco
+    notification = Notification(
+        user_id=user.id,
+        type="welcome",
+        title="Bem-vindo ao Pense Offline!",
+        message=f"Olá {user.name}! Obrigado por criar sua conta. Estamos felizes em ter você conosco!"
+    )
+    session.add(notification)
+    session.commit()
     
     token = create_access_token({"sub": user.username})
     return Token(access_token=token, token_type="bearer", user=user_to_public(user))

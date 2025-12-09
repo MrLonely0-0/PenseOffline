@@ -103,6 +103,13 @@ class APIClient {
     return !!this.token && !!this.user;
   }
 
+  /**
+   * Obter dados do usuário do cache
+   */
+  getUser() {
+    return this.user;
+  }
+
   // ===== USUÁRIOS =====
 
   /**
@@ -289,6 +296,43 @@ class APIClient {
     });
     if (!response.ok) throw new Error("Erro ao buscar ranking");
     return response.json();
+  }
+
+  // ===== NOTIFICAÇÕES =====
+
+  /**
+   * Obter notificações do usuário
+   */
+  async getNotifications() {
+    const response = await fetch(`${API_URL}/notifications`, {
+      headers: this.getAuthHeader(),
+    });
+    if (!response.ok) throw new Error("Erro ao buscar notificações");
+    return response.json();
+  }
+
+  /**
+   * Marcar notificação como lida
+   */
+  async markNotificationAsRead(notificationId) {
+    const response = await fetch(`${API_URL}/notifications/${notificationId}/read`, {
+      method: "POST",
+      headers: this.getAuthHeader(),
+    });
+    if (!response.ok) throw new Error("Erro ao marcar notificação");
+    return response.json();
+  }
+
+  /**
+   * Obter contagem de notificações não lidas
+   */
+  async getUnreadNotificationsCount() {
+    const response = await fetch(`${API_URL}/notifications/unread/count`, {
+      headers: this.getAuthHeader(),
+    });
+    if (!response.ok) throw new Error("Erro ao contar notificações");
+    const data = await response.json();
+    return data.count;
   }
 }
 

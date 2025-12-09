@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste - Indicador de Login</title>
+  <link rel="stylesheet" href="/web-files/bootstrap.min.css">
+  <link rel="stylesheet" href="/web-files/theme.css">
+  <style>
+    body { padding-top: 70px; }
+    .test-section {
+      background: white;
+      padding: 40px;
+      margin: 40px auto;
+      max-width: 800px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .status-box {
+      padding: 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .logged-in { background: #d4edda; border: 2px solid #28a745; }
+    .logged-out { background: #f8d7da; border: 2px solid #dc3545; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">📵 Pense Offline</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Início</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+          <li class="active"><a href="/teste-login.html">Teste</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/login.html">Entrar</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="test-section">
+      <h1>🧪 Teste do Indicador de Login</h1>
+      <p class="lead">Esta página demonstra o sistema de indicação de usuário logado.</p>
+
+      <hr>
+
+      <h3>Status Atual</h3>
+      <div id="status-box" class="status-box logged-out">
+        <strong>Status:</strong> <span id="status-text">Verificando...</span><br>
+        <strong>Usuário:</strong> <span id="user-info">-</span>
+      </div>
+
+      <h3>Como funciona:</h3>
+      <ol>
+        <li><strong>Não logado:</strong> A navbar mostra o link "Entrar"</li>
+        <li><strong>Após login/cadastro:</strong> 
+          <ul>
+            <li>Link "Entrar" desaparece</li>
+            <li>Aparece dropdown com foto, nome e nível do usuário</li>
+            <li>Dropdown tem menu com: Dashboard, Perfil, Desafios, Ranking e Sair</li>
+            <li>Badge de notificações não lidas (se houver)</li>
+          </ul>
+        </li>
+        <li><strong>Em todas as páginas:</strong> O indicador aparece automaticamente</li>
+      </ol>
+
+      <h3>Ações de Teste:</h3>
+      <div class="btn-group" style="margin: 20px 0;">
+        <button class="btn btn-primary" onclick="testLogin()">Simular Login</button>
+        <button class="btn btn-default" onclick="testLogout()">Simular Logout</button>
+        <button class="btn btn-info" onclick="window.location.href='/login.html'">Ir para Login Real</button>
+        <button class="btn btn-success" onclick="updateUserIndicator()">Atualizar Indicador</button>
+      </div>
+
+      <h3>Informações do LocalStorage:</h3>
+      <pre id="localstorage-info" style="background: #f5f5f5; padding: 15px; border-radius: 5px;"></pre>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-client.js"></script>
+  <script src="/user-indicator.js"></script>
+  <script>
+    function updateStatus() {
+      const statusBox = document.getElementById('status-box');
+      const statusText = document.getElementById('status-text');
+      const userInfo = document.getElementById('user-info');
+      const localStorageInfo = document.getElementById('localstorage-info');
+
+      if (api.isAuthenticated()) {
+        const user = api.getUser();
+        statusBox.className = 'status-box logged-in';
+        statusText.textContent = '✅ LOGADO';
+        userInfo.textContent = `${user.name} (@${user.username}) - Nível ${user.nivel}`;
+      } else {
+        statusBox.className = 'status-box logged-out';
+        statusText.textContent = '❌ NÃO LOGADO';
+        userInfo.textContent = 'Nenhum usuário logado';
+      }
+
+      // Mostrar conteúdo do localStorage
+      const token = localStorage.getItem('pensOffline_token');
+      const user = localStorage.getItem('pensOffline_user');
+      localStorageInfo.textContent = `Token: ${token ? token.substring(0, 50) + '...' : 'null'}\n\nUser: ${user || 'null'}`;
+    }
+
+    function testLogin() {
+      // Simular login
+      const fakeUser = {
+        id: 999,
+        username: "usuario_teste",
+        name: "Usuário de Teste",
+        email: "teste@example.com",
+        nivel: 5,
+        pontos: 500
+      };
+      api.setToken('fake-token-12345', fakeUser);
+      updateStatus();
+      updateUserIndicator();
+      alert('Login simulado! Veja a navbar.');
+    }
+
+    function testLogout() {
+      api.logout();
+      updateStatus();
+      window.location.reload();
+    }
+
+    // Atualizar status ao carregar
+    document.addEventListener('DOMContentLoaded', updateStatus);
+  </script>
+</body>
+</html>
