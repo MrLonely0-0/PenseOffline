@@ -1,4 +1,10 @@
 {
+  "name": "pense-offline",
+  "version": "1.0.0",
+  "description": "Reduza seu tempo de tela e ganhe recompensas",
+  "scripts": {
+    "vercel-build": "pip install -r requirements.txt -r backend/requirements.txt && echo 'Build complete'"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0"
   }

@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "pip install -r requirements.txt -r backend/requirements.txt",
   "builds": [
     {
       "src": "api/index.py",
@@ -9,10 +8,6 @@
         "pythonVersion": "3.11",
         "maxLambdaSize": "50mb"
       }
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build"
     }
   ],
   "routes": [
