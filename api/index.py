@@ -1,16 +1,33 @@
 """
-Vercel serverless function that runs the FastAPI backend
-This file acts as the entry point for all /api/* routes on Vercel
+Vercel serverless function entry point for FastAPI backend
+Routes /api/* to the FastAPI application
 """
 
 import sys
+import os
 from pathlib import Path
 
-# Add backend directory to path so imports work
-backend_dir = Path(__file__).parent.parent / "backend"
-sys.path.insert(0, str(backend_dir))
+# Set Python path to include backend
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
-# Import and expose the FastAPI app
-from app.main import app
+# Set required environment variables
+if not os.environ.get('DATABASE_URL'):
+    os.environ['DATABASE_URL'] = 'sqlite:///./app.db'
 
-# Vercel requires the app to be exported as 'app' for serverless
+if not os.environ.get('SECRET_KEY'):
+    os.environ['SECRET_KEY'] = 'dev-key-change-in-production'
+
+try:
+    from app.main import app
+except ImportError as e:
+    print(f"Error importing FastAPI app: {e}")
+    # Fallback app for debugging
+    from fastapi import FastAPI
+    app = FastAPI()
+    
+    @app.get("/health")
+    def health():
+        return {"status": "error", "message": str(e)}
+
+# Export the app as a ASGI application for Vercel
+# Vercel will automatically detect this as a Python ASGI app
