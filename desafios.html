@@ -160,7 +160,7 @@
 
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
+        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
         const res = await fetch(`${apiBase}/rewards/complete-challenge`, {
           method: 'POST',
           headers: {

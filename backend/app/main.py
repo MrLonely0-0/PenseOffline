@@ -18,16 +18,6 @@ from .routers import communities, events, users
 # Ocultar documentação OpenAPI/Swagger em ambientes públicos
 app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, redoc_url=None, openapi_url=None)
 
-# Middleware para lidar com requisições do Vercel que vêm com /api
-@app.middleware("http")
-async def strip_api_prefix(request: Request, call_next):
-    """Remove /api prefix se a requisição vem do Vercel (localhost ou Vercel domain)"""
-    path = request.url.path
-    if path.startswith("/api/"):
-        # Remover /api e deixar apenas /users, /health, etc
-        request.scope["path"] = path[4:]  # Remove "/api"
-    return await call_next(request)
-
 # Configurar CORS para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
