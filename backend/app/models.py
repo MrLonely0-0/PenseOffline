@@ -43,7 +43,7 @@ class XPHistory(SQLModel, table=True):
     event_id: Optional[int] = Field(default=None, foreign_key="event.id")
     type: str = Field(default="manual")
     xp_amount: int = Field(default=0)
-    meta: Optional[str] = None
+    metadata: Optional[dict] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
