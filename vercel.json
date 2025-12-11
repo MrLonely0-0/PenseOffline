@@ -1,15 +1,19 @@
 {
   "version": 2,
+  "buildCommand": "pip install -r backend/requirements.txt",
   "builds": [
     {
-      "src": "backend/app/main.py",
-      "use": "@vercel/python"
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.11"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/app/main.py"
+      "dest": "api/index.py"
     },
     {
       "src": "/(.*)",
