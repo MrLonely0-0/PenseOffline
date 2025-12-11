@@ -229,7 +229,7 @@
         const email = document.getElementById('edit-email').value;
         const phone = document.getElementById('edit-phone').value;
 
-        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
         const response = await fetch(`${apiBase}/users/me?name=` + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) + '&phone=' + encodeURIComponent(phone), {
           method: 'PUT',
           headers: {
@@ -263,7 +263,7 @@
 
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
         const response = await fetch(`${apiBase}/users/me`, {
           method: 'DELETE',
           headers: {

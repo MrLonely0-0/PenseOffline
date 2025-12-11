@@ -8,7 +8,7 @@ const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL)
   ? window.PENSEOFFLINE_API_URL
   : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? "http://127.0.0.1:8000"
-    : window.location.origin;  // Em produção, usar a mesma origem (sem /api)
+    : `${window.location.origin}/api`;
 
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";

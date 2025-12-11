@@ -119,7 +119,7 @@
       messageDiv.innerHTML = '<div class="alert alert-info">Criando conta...</div>';
 
       try {
-        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
         const response = await fetch(`${apiBase}/profiles`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

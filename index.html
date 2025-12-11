@@ -209,7 +209,7 @@
     // Carregar estatísticas globais
     async function loadStats() {
       try {
-        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
         const res = await fetch(`${apiBase}/stats/global`);
         if (res.ok) {
           const stats = await res.json();

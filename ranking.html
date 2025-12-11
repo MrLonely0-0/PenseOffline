@@ -124,7 +124,7 @@
     async function loadRanking() {
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const apiBase = window.PENSEOFFLINE_API_URL || window.location.origin;
+        const apiBase = window.PENSEOFFLINE_API_URL || `${window.location.origin}/api`;
         const res = await fetch(`${apiBase}/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
