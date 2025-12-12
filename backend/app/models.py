@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
 from typing import List
+from sqlalchemy import JSON
 import json
 
 
@@ -43,7 +44,7 @@ class XPHistory(SQLModel, table=True):
     event_id: Optional[int] = Field(default=None, foreign_key="event.id")
     type: str = Field(default="manual")
     xp_amount: int = Field(default=0)
-    metadata: Optional[dict] = Field(default=None)
+    xp_metadata: Optional[dict] = Field(default=None, sa_type=JSON)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
