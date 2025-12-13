@@ -3,12 +3,31 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-// Detecção automática do URL da API
-// Se estiver definido em window.PENSEOFFLINE_API_URL, usar esse valor
-// Caso contrário, usar o host atual (para funcionar em rede local)
-const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) 
-  ? window.PENSEOFFLINE_API_URL 
-  : (typeof window !== 'undefined' ? `http://${window.location.hostname}:8000` : "http://127.0.0.1:8000");
+// Detecção inteligente do URL da API
+// Prioridade: 1) window.PENSEOFFLINE_API_URL (manual)
+//             2) Produção (GitHub Pages detectado)
+//             3) Desenvolvimento local
+function getApiUrl() {
+  if (typeof window === 'undefined') return "http://127.0.0.1:8000";
+  
+  // Configuração manual tem prioridade
+  if (window.PENSEOFFLINE_API_URL) {
+    return window.PENSEOFFLINE_API_URL;
+  }
+  
+  // Detectar se está em produção (GitHub Pages)
+  if (window.location.hostname.includes('github.io')) {
+    // URL do backend em produção - ATUALIZE AQUI após fazer deploy no Render
+    return "https://pense-offline-api.onrender.com";
+  }
+  
+  // Desenvolvimento local - usar hostname atual
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}:8000`;
+}
+
+const API_URL = getApiUrl();
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";
 

@@ -1,23 +1,25 @@
-# Render deployment manifest (blueprint) for Desafio Positivo backend
-# Use this file when importing the repository to Render using Infrastructure as Code
+# Render deployment configuration for Pense Offline
+# Deploy: https://render.com -> New Web Service -> Connect repo -> Use this config
 
 services:
+  # Backend API (FastAPI)
   - type: web
-    name: desafio-positivo-backend
-    env: docker
+    name: pense-offline-api
+    env: python
     plan: free
     region: oregon
-    branch: main
+    branch: master
     autoDeploy: true
     rootDir: backend
-    dockerfilePath: ./Dockerfile
-    healthCheckPath: /api/health/
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
-      - key: DJANGO_SECRET_KEY
+      - key: DATABASE_URL
+        sync: false  # Você deve adicionar manualmente no dashboard
+      - key: SECRET_KEY
         generateValue: true
-      - key: DJANGO_DEBUG
-        value: 'False'
-      - key: DATABASE_ENGINE
-        value: 'postgresql'
+      - key: ENVIRONMENT
+        value: production
 
 

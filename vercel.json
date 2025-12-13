@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/app/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/users/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/communities/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/events/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/notifications/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/profiles/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/rewards/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/stats/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "backend/app/main.py"
+    }
+  ],
+  "env": {
+    "ENVIRONMENT": "production"
+  }
+}
