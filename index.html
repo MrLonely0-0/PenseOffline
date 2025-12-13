@@ -196,6 +196,7 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-config.js"></script>
   <script src="/api-client.js"></script>
   <script src="/user-indicator.js"></script>
   <script>
@@ -210,7 +211,7 @@
     // Carregar estatísticas globais
     async function loadStats() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/stats/global');
+        const res = await fetch(`${window.API_BASE_URL}/stats/global`);
         if (res.ok) {
           const stats = await res.json();
           document.getElementById('total-users').textContent = stats.total_usuarios;

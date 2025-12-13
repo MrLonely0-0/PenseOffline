@@ -21,10 +21,10 @@ from .routers import communities, events, users, notifications
 # Ocultar documentação OpenAPI/Swagger em ambientes públicos
 app = FastAPI(title="Pense Offline Backend", version="0.2.0", docs_url=None, redoc_url=None, openapi_url=None)
 
-# Configurar CORS para permitir requisições do frontend
+# Configurar CORS para permitir requisições do frontend (incluindo acesso externo)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:5173", "http://localhost:5173", "http://127.0.0.1:8000", "http://localhost:8000"],
+    allow_origins=["*"],  # Permitir todas as origens para acesso em rede local
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

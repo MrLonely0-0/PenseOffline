@@ -3,7 +3,12 @@
  * Gerencia autenticação, requisições autenticadas e armazenamento de token JWT
  */
 
-const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) ? window.PENSEOFFLINE_API_URL : "http://127.0.0.1:8000";
+// Detecção automática do URL da API
+// Se estiver definido em window.PENSEOFFLINE_API_URL, usar esse valor
+// Caso contrário, usar o host atual (para funcionar em rede local)
+const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL) 
+  ? window.PENSEOFFLINE_API_URL 
+  : (typeof window !== 'undefined' ? `http://${window.location.hostname}:8000` : "http://127.0.0.1:8000");
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";
 

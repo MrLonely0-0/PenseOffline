@@ -144,6 +144,7 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="/api-config.js"></script>
   <script src="/api-client.js"></script>
   <script src="/user-indicator.js"></script>
   <script>
@@ -161,7 +162,7 @@
 
       try {
         const token = localStorage.getItem('pensOffline_token');
-        const res = await fetch('http://127.0.0.1:8000/rewards/complete-challenge', {
+        const res = await fetch(`${window.API_BASE_URL}/rewards/complete-challenge`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
