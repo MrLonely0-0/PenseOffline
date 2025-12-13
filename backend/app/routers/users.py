@@ -2,12 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlmodel import Session, select
 from typing import List, Optional
 import re
+import logging
 
 from ..database import get_session
 from ..models import UserProfile, UserPublic, UserCreate, UserLogin, Token, XPHistory, Notification
 from ..auth import get_current_user, hash_password, verify_password, create_access_token, user_to_public
 
 router = APIRouter(prefix="/users", tags=["users"])
+logger = logging.getLogger(__name__)
 
 
 def validate_username(username: str) -> tuple[bool, str]:
@@ -49,37 +51,58 @@ def list_users(current_user: UserProfile = Depends(get_current_user), session: S
 
 @router.post("/register", response_model=Token, status_code=201)
 def register(user_data: UserCreate, session: Session = Depends(get_session)):
+    logger.info("=" * 70)
+    logger.info("📝 NOVA REQUISIÇÃO DE CADASTRO")
+    logger.info("=" * 70)
+    logger.info(f"👤 Username: {user_data.username}")
+    logger.info(f"📧 Email: {user_data.email}")
+    logger.info(f"📛 Nome: {user_data.name}")
+    logger.info(f"📱 Telefone: {user_data.phone or 'Não fornecido'}")
+    
     # Validar username (como @instagram)
+    logger.info("🔍 Validando username...")
     valid, msg = validate_username(user_data.username)
     if not valid:
+        logger.warning(f"❌ Validação username falhou: {msg}")
         raise HTTPException(status_code=400, detail=msg)
+    logger.info("✅ Username válido")
     
     # Validar email
+    logger.info("🔍 Validando email...")
     valid, msg = validate_email(user_data.email)
     if not valid:
+        logger.warning(f"❌ Validação email falhou: {msg}")
         raise HTTPException(status_code=400, detail=msg)
+    logger.info("✅ Email válido")
     
     # Verificar username único (case-insensitive)
+    logger.info("🔍 Verificando se username já existe...")
     existing_user = session.exec(
         select(UserProfile).where(UserProfile.username.ilike(user_data.username))
     ).first()
     if existing_user:
+        logger.warning(f"❌ Username '{user_data.username}' já existe (ID: {existing_user.id})")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Username '@{user_data.username}' já está em uso"
         )
+    logger.info("✅ Username disponível")
     
     # Verificar email único (case-insensitive)
+    logger.info("🔍 Verificando se email já existe...")
     existing_email = session.exec(
         select(UserProfile).where(UserProfile.email.ilike(user_data.email))
     ).first()
     if existing_email:
+        logger.warning(f"❌ Email '{user_data.email}' já cadastrado (ID: {existing_email.id})")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email já está cadastrado"
         )
+    logger.info("✅ Email disponível")
     
     # Criar novo usuário
+    logger.info("💾 Criando usuário no banco de dados...")
     user = UserProfile(
         username=user_data.username,
         name=user_data.name,
@@ -90,8 +113,10 @@ def register(user_data: UserCreate, session: Session = Depends(get_session)):
     session.add(user)
     session.commit()
     session.refresh(user)
+    logger.info(f"✅ Usuário criado com sucesso! ID: {user.id}")
     
     # Registrar notificação de boas-vindas no banco
+    logger.info("🔔 Criando notificação de boas-vindas...")
     notification = Notification(
         user_id=user.id,
         type="welcome",
@@ -100,8 +125,18 @@ def register(user_data: UserCreate, session: Session = Depends(get_session)):
     )
     session.add(notification)
     session.commit()
+    logger.info(f"✅ Notificação criada! ID: {notification.id}")
     
+    logger.info("🔑 Gerando token de autenticação...")
     token = create_access_token({"sub": user.username})
+    logger.info("✅ Token gerado com sucesso")
+    
+    logger.info("=" * 70)
+    logger.info("🎉 CADASTRO CONCLUÍDO COM SUCESSO!")
+    logger.info(f"   Usuário: {user.username} (ID: {user.id})")
+    logger.info(f"   Email: {user.email}")
+    logger.info("=" * 70)
+    
     return Token(access_token=token, token_type="bearer", user=user_to_public(user))
 
 
@@ -109,13 +144,43 @@ def register(user_data: UserCreate, session: Session = Depends(get_session)):
 
 @router.post("/login", response_model=Token)
 def login(credentials: UserLogin, session: Session = Depends(get_session)):
+    logger.info("=" * 70)
+    logger.info("🔐 NOVA REQUISIÇÃO DE LOGIN")
+    logger.info("=" * 70)
+    logger.info(f"👤 Username: {credentials.username}")
+    
+    logger.info("🔍 Buscando usuário no banco...")
     user = session.exec(select(UserProfile).where(UserProfile.username.ilike(credentials.username))).first()
-    if not user or not verify_password(credentials.password, user.password_hash):
+    
+    if not user:
+        logger.warning(f"❌ Usuário '{credentials.username}' não encontrado")
         raise HTTPException(status_code=401, detail="Username ou senha incorretos")
+    
+    logger.info(f"✅ Usuário encontrado: {user.username} (ID: {user.id})")
+    logger.info("🔍 Verificando senha...")
+    
+    if not verify_password(credentials.password, user.password_hash):
+        logger.warning(f"❌ Senha incorreta para usuário '{credentials.username}'")
+        raise HTTPException(status_code=401, detail="Username ou senha incorretos")
+    
+    logger.info("✅ Senha correta")
+    logger.info("📅 Atualizando último acesso...")
+    
     from datetime import datetime
     user.ultimo_acesso = datetime.utcnow()
     session.add(user)
     session.commit()
+    logger.info(f"✅ Último acesso atualizado: {user.ultimo_acesso}")
+    
+    logger.info("🔑 Gerando token de autenticação...")
+    token = create_access_token({"sub": user.username})
+    logger.info("✅ Token gerado")
+    
+    logger.info("=" * 70)
+    logger.info("🎉 LOGIN REALIZADO COM SUCESSO!")
+    logger.info(f"   Usuário: {user.username} (ID: {user.id})")
+    logger.info(f"   Nome: {user.name}")
+    logger.info("=" * 70)
     token = create_access_token({"sub": user.username})
     return Token(access_token=token, token_type="bearer", user=user_to_public(user))
 

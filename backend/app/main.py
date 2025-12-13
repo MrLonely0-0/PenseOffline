@@ -93,12 +93,8 @@ def health():
     return {"status": "ok"}
 
 
-@app.get("/", response_class=HTMLResponse)
-def root():
-    index_file = _templates_dir / "index.html"
-    if index_file.exists():
-        return index_file.read_text(encoding="utf-8")
-    return "<h1>Backend online</h1><p>API de Recompensas por Redução de Tempo de Tela</p>"
+# Rota raiz será servida pelo StaticFiles (index.html da raiz do projeto)
+# Removida rota @app.get("/") para evitar conflito
 
 
 # Authentication endpoints are provided in `users` router (mounted at /users)

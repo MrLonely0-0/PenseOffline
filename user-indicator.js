@@ -15,13 +15,24 @@
   /**
    * Atualizar navbar com informações do usuário
    */
-  function updateNavbar() {
+  async function updateNavbar() {
     const navbarRight = document.querySelector('.navbar-nav.navbar-right');
     if (!navbarRight) return;
 
     // Limpar links de login/entrar existentes se usuário estiver logado
     if (api.isAuthenticated()) {
-      const user = api.getUser();
+      // Obter usuário atualizado do servidor para garantir dados completos
+      let user = api.getUser();
+      
+      // Se o usuário do cache não tiver campos essenciais, buscar do servidor
+      if (!user || !user.username || !user.name) {
+        try {
+          user = await api.getCurrentUser();
+        } catch (err) {
+          console.error('Erro ao obter dados do usuário:', err);
+          return;
+        }
+      }
       
       // Remover link "Entrar" se existir
       const loginLinks = navbarRight.querySelectorAll('a[href*="login"]');
@@ -166,19 +177,21 @@
    * Inicializar quando DOM estiver pronto
    */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      updateNavbar();
+    document.addEventListener('DOMContentLoaded', async function() {
+      await updateNavbar();
       addLoginStatusIndicator();
     });
   } else {
-    updateNavbar();
-    addLoginStatusIndicator();
+    (async () => {
+      await updateNavbar();
+      addLoginStatusIndicator();
+    })();
   }
 
   // Atualizar quando usuário fizer login/logout
-  window.addEventListener('storage', function(e) {
+  window.addEventListener('storage', async function(e) {
     if (e.key === 'pensOffline_token') {
-      updateNavbar();
+      await updateNavbar();
     }
   });
 
