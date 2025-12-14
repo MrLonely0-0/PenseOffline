@@ -8,7 +8,9 @@ const API_URL = (typeof window !== 'undefined' && window.PENSEOFFLINE_API_URL)
   ? window.PENSEOFFLINE_API_URL
   : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? "http://127.0.0.1:8000"
-    : `${window.location.origin}/api`;
+    : (window.location.hostname.endsWith('vercel.app')
+        ? "https://pense-offline-api.onrender.com"
+        : `${window.location.origin}/api`);
 
 const TOKEN_KEY = "pensOffline_token";
 const USER_KEY = "pensOffline_user";
